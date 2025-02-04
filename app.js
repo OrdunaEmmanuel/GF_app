@@ -1,6 +1,10 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const app = express();
+const express = require("express")
+const dotenv = require("dotenv")
+const app = express()
+const crypto = require("crypto")
+const cookieParser = require("cookie-parser")
+const connectDB = require('./API/CONFIG/db')
+
 
 
 dotenv.config();
@@ -15,3 +19,4 @@ async function StartServer() {
 }
 
 StartServer();
+connectDB();
