@@ -1,10 +1,11 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const app = express();
-
+const connectDB = require("./API/CONFIG/db");
 
 dotenv.config();
 
+// levantar servidor
 async function StartServer() {
     const port = process.env.PORT || 3000; 
     app.listen(port, () => {
@@ -13,5 +14,9 @@ async function StartServer() {
         console.log('=============================================');   
     });
 }
+
+// conexion a la base de datos 
+
+connectDB();
 
 StartServer();
