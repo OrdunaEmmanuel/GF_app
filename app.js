@@ -1,11 +1,11 @@
 const express = require("express")
 const dotenv = require("dotenv")
 const app = express()
-const crypto = require("crypto")
-const cookieParser = require("cookie-parser")
 const connectDB = require('./API/CONFIG/db')
+const rutas = require('./API/ROUTES/ruta')
 
-
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 dotenv.config();
 
@@ -17,6 +17,8 @@ async function StartServer() {
         console.log('=============================================');   
     });
 }
+
+app.use('/', rutas)
 
 StartServer();
 connectDB();
