@@ -21,7 +21,7 @@ document.getElementById('iniciar').addEventListener('click', function() {
             console.log('Reconocimiento de voz finalizado.');
         };
 
-        reconocimiento.start(); // Iniciar el reconocimiento de voz
+        reconocimiento.start(); 
     } else {
         alert('Lo siento, tu navegador no soporta la API de reconocimiento de voz.');
     }
