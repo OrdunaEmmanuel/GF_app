@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const app = express();
 
+const connectDB = require('./API/CONFIG/database')
 
 dotenv.config();
 
@@ -15,3 +16,4 @@ async function StartServer() {
 }
 
 StartServer();
+connectDB();
