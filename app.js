@@ -1,9 +1,14 @@
 const express = require("express");
+const rutas = require('./API/ROUTES/ruta')
 const dotenv = require("dotenv");
 const app = express();
 const connectDB = require("./API/CONFIG/db");
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 dotenv.config();
+
 
 // levantar servidor
 async function StartServer() {
@@ -16,7 +21,7 @@ async function StartServer() {
 }
 
 // conexion a la base de datos 
-
+app.use('/', rutas)
 connectDB();
 
 StartServer();
