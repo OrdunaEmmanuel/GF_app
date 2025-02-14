@@ -11,11 +11,11 @@ exports.validateFC = (data) => {
             'string.max': 'El número de celular debe tener máximo 10 caracteres',
             'any.required': 'El número de celular es requerido'
         }),
-        correoCliente: Joi.string().email().required().messages({
+        correo: Joi.string().email().required().messages({
             'string.email': 'El correo no es válido',
             'any.required': 'El correo es requerido'
         }),
-        passwordCliente: Joi.string().min(6).required().messages({
+        password: Joi.string().min(6).required().messages({
             'string.min': 'La contraseña debe tener mínimo 6 caracteres',
             'any.required': 'La contraseña es requerida'
         }),
@@ -30,7 +30,7 @@ exports.validateFP = (data) => {
             'string.min': 'El nombre debe tener mínimo 3 caracteres',
             'any.required': 'El nombre es requerido'
         }),
-        correoPreventista: Joi.string().email().required().messages({
+        correo: Joi.string().email().required().messages({
             'string.email': 'El correo no es válido',
             'any.required': 'El correo es requerido'
         }),
@@ -39,7 +39,7 @@ exports.validateFP = (data) => {
             'string.max': 'El número de celular debe tener máximo 10 caracteres',
             'any.required': 'El número de celular es requerido'
         }),
-        passwordPreventista: Joi.string().min(6).required().messages({
+        password: Joi.string().min(6).required().messages({
             'string.min': 'La contraseña debe tener mínimo 6 caracteres',
             'any.required': 'La contraseña es requerida'
         })
@@ -53,7 +53,7 @@ exports.validateFS = (data) => {
             'string.min': 'El nombre debe tener mínimo 3 caracteres',
             'any.required': 'El nombre es requerido'
         }),
-        correoSucursal: Joi.string().email().required().messages({
+        correo: Joi.string().email().required().messages({
             'string.email': 'El correo no es válido',
             'any.required': 'El correo es requerido'
         }),

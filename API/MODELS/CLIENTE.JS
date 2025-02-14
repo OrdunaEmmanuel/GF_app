@@ -5,8 +5,8 @@ const ClienteSchema = new mongoose.Schema({
     nombreCliente: {type: String, required: true},
     numeroCliente: {type: String, unique: true},
     numero_celular: {type: String, required: true},
-    correoCliente: {type: String, required: true, unique: true},
-    passwordCliente: {type: String, required: true},
+    correo: {type: String, required: true, unique: true},
+    password: {type: String, required: true},
     direccion: {type: String},
     token: {type: String, default: ""},
     tipo_usuario: {type: String, default: "C"}
@@ -27,5 +27,4 @@ ClienteSchema.pre('save', async function (next) {
     next();
 })
 
-const Cliente = mongoose.model('Cliente', ClienteSchema)
-module.exports = Cliente
+module.exports = mongoose.models.Cliente || mongoose.model('Cliente', ClienteSchema);

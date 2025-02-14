@@ -14,8 +14,8 @@ exports.createCliente = async (req, res) => {
         const clienteData = {
             nombreCliente: req.body.nombreFC,
             numero_celular: req.body.numero_celularFC,
-            correoCliente: req.body.correoFC,
-            passwordCliente: hashedPassword,
+            correo: req.body.correoFC,
+            password: hashedPassword,
             direccion: req.body.direccionFC || ""
         };
 
