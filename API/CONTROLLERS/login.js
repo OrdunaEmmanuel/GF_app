@@ -12,8 +12,6 @@ const SECRET_KEYS = {
     S: process.env.JWT_SECRET_SUCURSAL
 };
 
-console.log("Secret Keys:", SECRET_KEYS)
-
 exports.login = async (req, res) => {
     try {
         const { numero_celular, password } = req.body
@@ -54,6 +52,27 @@ exports.login = async (req, res) => {
         })
 
     } catch (err) {
+        res.status(500).send(err.message)
+    }
+}
+
+exports.logout = async (req, res) => {
+    try{
+        const { id } = req.body
+        let usuario = await ClienteModel.findById(id) ||
+        await SucursalModel.findById(id) ||
+        await PreventistaModel.findById(id)
+        
+        if(!usuario){
+            return res.status(404).json({msg: "Usuario no encontrado"})
+        }
+        
+        usuario.token = ""
+        await usuario.save()
+        
+        res.status(200).json({msg: "Sesión finalizada correctamente"})
+
+    }catch(err){
         res.status(500).send(err.message)
     }
 }

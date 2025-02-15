@@ -7,6 +7,7 @@ const routeUser = require('../CONTROLLERS/login.js')
  * Route Login
  */
 router.post('/login', routeUser.login)
+router.post('/logout', routeUser.logout)
 /**
  * Route Cliente
  */
