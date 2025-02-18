@@ -21,7 +21,8 @@ async function StartServer() {
 }
 
 // conexion a la base de datos 
-app.use('/', rutas)
 connectDB();
+app.use('/', rutas)
+
 
 StartServer();
