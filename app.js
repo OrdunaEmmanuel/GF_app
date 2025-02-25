@@ -1,8 +1,8 @@
-const express = require("express");
+const express = require("express")
+const dotenv = require("dotenv")
+const app = express()
+const connectDB = require('./API/CONFIG/db')
 const rutas = require('./API/ROUTES/ruta')
-const dotenv = require("dotenv");
-const app = express();
-const connectDB = require("./API/CONFIG/db");
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -20,9 +20,12 @@ async function StartServer() {
     });
 }
 
+app.use('/', rutas)
+
 // conexion a la base de datos 
 connectDB();
 app.use('/', rutas)
 
 
 StartServer();
+connectDB();

@@ -1,10 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const authM = require('../MIDDLEWARE/auth.js')
 const routeClient = require('../CONTROLLERS/cliente.js')
-const routeProducts=require('../CONTROLLERS/searchProducts.js')
+const routeUser = require('../CONTROLLERS/login.js')
 
-
+/**
+ * Route Login
+ */
+router.post('/login', routeUser.login)
+router.post('/logout', routeUser.logout)
 /**
  * Route Cliente
  */
