@@ -13,7 +13,7 @@ router.post('/logout', routeUser.logout)
  */
 router.post('/cliente/add', routeClient.createCliente)
 //Route search products
-router.get('/productos-get',routeProducts.obtenerProductos)
+//router.get('/productos-get',routeProducts.obtenerProductos)
 
 
 module.exports = router
