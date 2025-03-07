@@ -42,10 +42,8 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { login };
-
 // Función para cerrar sesión (logout)
-exports.logout = async (req, res) => {
+const logout = async (req, res) => {
   const { id, tipo_usuario = "clientes" } = req.user; // El ID y tipo de usuario se obtienen del middleware
 
   try {
@@ -68,7 +66,7 @@ exports.logout = async (req, res) => {
 };
 
 // Middleware para verificar el token
-exports.authenticate = async (req, res, next) => {
+const authenticate = async (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
@@ -102,4 +100,11 @@ exports.authenticate = async (req, res, next) => {
       message: "Token inválido o expirado",
     });
   }
+};
+
+// Exportar las funciones
+module.exports = {
+  login,
+  logout,
+  authenticate,
 };
