@@ -1,37 +1,34 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const { connectDB } = require("./API/CONFIGS/db.config");
-const rutasAuth = require("./API/ROUTES/auth.routes");
+const rateLimit = require("express-rate-limit");
+
+const rutasClientes = require('./API/ROUTES/client.routes');
+//const rutasClientes = require('./API/ROUTES/auth.routes');
 
 dotenv.config();
 
 const app = express();
 
+const corsOptions = { origin: "*" };
+
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
-// Conectar a MySQL
+// Conexión a base de datos
+const { connectDB } = require('./API/CONFIGS/db.config');
 connectDB();
 
-// Ruta auth
-app.use("/auth", rutasAuth);
+// Rutas
+//app.use("/auth", rutasAuth);
+app.use("/clientes", rutasClientes);
 
-// Ruta inicial
-app.get("/", (req, res) => {
-    res.send("🚀 API de Ferretería en funcionamiento...");
-});
 
-//**************************************************** */
-// Paquetes que se deben instalar:
-// npm install mysql2 dotenv
-// npm install cors
-//**************************************************** */
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
-    console.log("=============================================");
-    console.log(`🚀 Servidor funcionando en http://localhost:${port}`);
-    console.log("=============================================");
+  console.log("=============================================");
+  console.log(`🚀 Servidor funcionando en http://localhost:${port}`);
+  console.log("=============================================");
 });
