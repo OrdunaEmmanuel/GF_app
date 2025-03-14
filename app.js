@@ -3,12 +3,12 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 
+const rutasClientes = require('./API/ROUTES/client.routes');
+//const rutasClientes = require('./API/ROUTES/auth.routes');
+
 dotenv.config();
 
 const app = express();
-
-
-const rutasClientes = require('./API/ROUTES/client.routes');
 
 const corsOptions = { origin: "*" };
 
@@ -21,12 +21,12 @@ const { connectDB } = require('./API/CONFIGS/db.config');
 connectDB();
 
 // Rutas
-
+//app.use("/auth", rutasAuth);
 app.use("/clientes", rutasClientes);
 
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log("=============================================");
   console.log(`🚀 Servidor funcionando en http://localhost:${port}`);

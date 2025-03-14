@@ -6,9 +6,13 @@ exports.createCliente = async (req, res) => {
         const {
             nombre,
             apellido_p,
-            numero_celular,
-            password_user,
+            apellido_m,
+            clave,
             direccion,
+            curp,
+            numero_cel,
+            password_user,
+            tipo_usuario,
             id_localidad,
         } = req.body;
 
@@ -22,9 +26,13 @@ exports.createCliente = async (req, res) => {
         const cliente = {
             nombre,
             apellido_p,
-            numero_celular,
+            apellido_m,
+            clave,
             direccion,
+            curp,
+            numero_cel,
             password_user: hashedPassword,
+            tipo_usuario,
             id_localidad,
         };
 

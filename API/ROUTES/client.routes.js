@@ -4,4 +4,6 @@ router = express.Router()
 
 router.post('/register', clienteCtrl.createCliente)
 
+router.post('/getClientes', clienteCtrl.getClientes)
+
 module.exports = router
