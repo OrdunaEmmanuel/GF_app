@@ -18,9 +18,9 @@ const Cliente = {
 
         const [result] = await pool.query(
             `INSERT INTO usuario 
-            (nombre, apellido_p, apellido_m, clave, direcion, curp, numero_cel, password_user, tipo_usuario, id_localidad) 
-            VALUES (?, ?, 'cliente', ?)`,
-            [nombre, apellido_p, id_localidad]
+            (nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, id_localidad) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, id_localidad]
         );
 
         return result.insertId;
@@ -36,7 +36,7 @@ const Cliente = {
 
     getAll: async () => {
         const [rows] = await pool.query(
-            `SELECT id_usuario, nombre, apellido_p, apellido_m, clave, direcion, curp, numero_cel, password_user, tipo_usuario, id_localidad FROM usuario WHERE tipo_usuario='cliente'`
+            `SELECT id_usuario, nombre, apellido_p, apellido_m, clave, direcion, curp, numero_cel, password_user, tipo_usuario, id_localidad FROM usuario`
         );
         return rows;
     },

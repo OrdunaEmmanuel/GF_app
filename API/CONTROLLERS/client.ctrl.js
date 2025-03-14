@@ -16,7 +16,7 @@ exports.createCliente = async (req, res) => {
             id_localidad,
         } = req.body;
 
-        const clienteExistente = await Cliente.findByNumeroCelular(numero_celular);
+        const clienteExistente = await Cliente.findByNumeroCelular(numero_cel);
         if (clienteExistente) {
             return res.status(400).json({ error: "El número de celular ya está registrado." });
         }
