@@ -1,5 +1,5 @@
-const Cliente = require("../MODELS/client.mdl");
-const bcrypt = require("bcrypt");
+const Cliente = require("../MODELS/clientModel/client.mdl.js");
+const bcrypt = require('bcrypt');
 
 exports.createCliente = async (req, res) => {
     try {
