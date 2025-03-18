@@ -1,4 +1,4 @@
-const { pool } = require("../CONFIGS/db.config");
+const { pool } = require("../../CONFIGS/db.config");
 
 const Cliente = {
     // Crear un nuevo cliente

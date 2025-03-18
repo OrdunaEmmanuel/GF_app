@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 
-const rutasClientes = require('./API/ROUTES/clientesRoutes/client.routes');
+const rutasClientes = require('./API/CONTROLLERS/clientController/client.ctrl');
 //const rutasClientes = require('./API/ROUTES/auth.routes');
 
 dotenv.config();
@@ -11,6 +11,7 @@ dotenv.config();
 const app = express();
 
 const corsOptions = { origin: "*" };
+
 
 app.use(cors());
 app.use(express.json());
