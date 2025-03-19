@@ -1,31 +1,29 @@
-const express = require("express");
+const express = require('express');
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path=require("path");
+const router=require("./API/ROUTES/Routes")
 const rateLimit = require("express-rate-limit");
-
-const rutasClientes = require('./API/CONTROLLERS/clientController/client.ctrl');
-//const rutasClientes = require('./API/ROUTES/auth.routes');
-
+const { connectDB } = require('./API/CONFIGS/db.config');
+const app = express();
 dotenv.config();
 
-const app = express();
+app.use(
+  cors({
+    origin: process.env.ACCES_CONTROL_ALLOW_ORIGIN || "*",
+    methods: "GET,POST,OPTIONS,PUT,PATCH,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,
+  }));
 
-const corsOptions = { origin: "*" };
-
-
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(router);
 
 
 // Conexión a base de datos
-const { connectDB } = require('./API/CONFIGS/db.config');
-connectDB();
 
-// Rutas
-//app.use("/auth", rutasAuth);
-app.use("/clientes", rutasClientes);
-app.use("/")
+connectDB();
 
 
 

@@ -1,4 +1,4 @@
-const ProductModel = require("../MODELS/product.model");
+const ProductModel = require("../../MODELS/productsModels/products.ctrl");
 
 const ProductController = {
     async getAll(req, res) {
@@ -7,6 +7,7 @@ const ProductController = {
             res.json(products);
         } catch (error) {
             res.status(500).json({ error: "Error al obtener los productos" });
+            console.log(error)
         }
     },
 
