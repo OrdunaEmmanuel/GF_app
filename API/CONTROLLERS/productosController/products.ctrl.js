@@ -37,8 +37,6 @@ const ProductController = {
             if (!term) {
                 return res.status(400).json({ error: "Se requiere un término de búsqueda" });
             }
-            
-
             const products = await ProductModel.searchProducts(term);
             res.json(products);
         } catch (error) {

@@ -1,19 +1,20 @@
 const { pool } = require("../../CONFIGS/db.config");
 
 
-//search all products
+//Query search all products
 const ProductModel = {
     async getAllProducts() {
         const [rows] = await pool.query("SELECT * FROM producto");
         return rows;
     },
 
-//search products by Id
+//Query search products by Id
     async getProductById(id) {
         const [rows] = await pool.query("SELECT * FROM producto WHERE codigo = ?", [id]);
         return rows[0];
     },
-//search products by name, or key 
+    
+//Query search products by name, or key 
     async searchProducts(searchTerm) {
         const query = `
             SELECT * FROM producto 
