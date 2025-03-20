@@ -10,6 +10,7 @@ router.post('/getClientes', clientController.getClientes)
 //routes products
 router.get("/getAll", ProductController.getAll);
 router.get("/getbyId/:id", ProductController.getById);
-router.post("/create", ProductController.create);
+router.post("/buscarByname", ProductController.search);  // Ahora es POST
+
 
 module.exports=router

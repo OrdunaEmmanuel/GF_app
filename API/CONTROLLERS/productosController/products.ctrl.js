@@ -1,4 +1,4 @@
-const ProductModel = require("../../MODELS/productsModels/products.ctrl");
+const ProductModel = require("../../MODELS/productsModels/products.mdl");
 
 const ProductController = {
     async getAll(req, res) {
@@ -29,7 +29,25 @@ const ProductController = {
         } catch (error) {
             res.status(500).json({ error: "Error al crear el producto" });
         }
+    },
+
+    async search(req, res) {
+        try {
+            const { term } = req.body;  // Obtener el término desde el frontend
+            if (!term) {
+                return res.status(400).json({ error: "Se requiere un término de búsqueda" });
+            }
+            
+
+            const products = await ProductModel.searchProducts(term);
+            res.json(products);
+        } catch (error) {
+            res.status(500).json({ error: "Error en la búsqueda de productos" });
+            console.log(error)
+        }
+
     }
+
 };
 
 module.exports = ProductController;
