@@ -10,7 +10,7 @@ const ProductModel = {
 
 //Query search products by Id
     async getProductById(id) {
-        const [rows] = await pool.query("SELECT * FROM producto WHERE codigo = ?", [id]);
+        const [rows] = await pool.query("SELECT * FROM producto WHERE id_producto = ?", [id]);
         return rows[0];
     },
     

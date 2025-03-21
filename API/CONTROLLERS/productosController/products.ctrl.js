@@ -43,7 +43,6 @@ const ProductController = {
             res.status(500).json({ error: "Error en la búsqueda de productos" });
             console.log(error)
         }
-
     }
 
 };
