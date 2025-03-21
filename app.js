@@ -1,50 +1,32 @@
-const express = require("express");
+const express = require('express');
 const dotenv = require("dotenv");
 const cors = require("cors");
+
+const path=require("path");
+const router=require("./API/ROUTES/Routes")
 const rateLimit = require("express-rate-limit");
-const helmet = require("helmet");
-const { connectDB } = require("./API/CONFIGS/db.config");
-const rutasAuth = require("./API/ROUTES/auth.routes");
-
-
+const { connectDB } = require('./API/CONFIGS/db.config');
+const app = express();
 dotenv.config();
 
-const app = express();
+app.use(
+  cors({
+    origin: process.env.ACCES_CONTROL_ALLOW_ORIGIN || "*",
+    methods: "GET,POST,OPTIONS,PUT,PATCH,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,
+  }));
 
-
-// Middlewares de seguridad
-app.use(helmet()); // Agrega cabeceras de seguridad HTTP
-app.use(cors()); // Habilita CORS
-
-// Limitar intentos de inicio de sesión
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // Límite de 5 intentos por IP
-  message: "Demasiados intentos, inténtalo de nuevo más tarde.",
-});
-app.use(limiter); // Aplica el límite de tasa a todas las rutas
-
-// Middlewares para parsear el cuerpo de las solicitudes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(router);
 
-// Conectar a MySQL
+
+// Conexión a base de datos
+
 connectDB();
 
-// Ruta auth
-app.use("/auth", rutasAuth);
 
-// Ruta inicial
-app.get("/", (req, res) => {
-  res.send("🚀 API de Ferretería en funcionamiento...");
-});
-
-//**************************************************** */
-// Paquetes que se deben instalar:
-// npm install mysql2 dotenv
-// npm install cors
-// npm install express-rate-limit helmet
-//**************************************************** */
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
