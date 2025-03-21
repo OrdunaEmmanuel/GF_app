@@ -12,5 +12,4 @@ router.get("/getAll", ProductController.getAll);
 router.get("/getbyId/:id", ProductController.getById);
 router.post("/buscarByname", ProductController.search);  // Ahora es POST
 
-
 module.exports=router
