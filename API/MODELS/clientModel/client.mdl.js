@@ -1,8 +1,6 @@
 const { pool } = require("../../CONFIGS/db.config");
 
-const Cliente = {
-    // Crear un nuevo cliente
-    create: async (cliente) => {
+const Cliente = {create: async (cliente) => {
         const {
             nombre,
             apellido_p,
