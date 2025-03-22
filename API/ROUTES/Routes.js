@@ -5,8 +5,11 @@ const ProductController=require("../CONTROLLERS/productosController/products.ctr
 
 
 //routes client
-router.post('/register', clientController.createCliente)+
+router.post('/register', clientController.createCliente)
 router.post('/getClientes', clientController.getClientes)
+router.post('/login', clientController.loginUser)
+router.post('/refresh-token', clientController.refreshToken)
+router.post('/logout', clientController.logoutUser)
 //routes products
 router.get("/getAll", ProductController.getAll);
 router.get("/getbyId/:id", ProductController.getById);

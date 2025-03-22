@@ -11,6 +11,7 @@ const Cliente = {create: async (cliente) => {
             numero_cel,
             password_user,
             tipo_usuario,
+            token,
             id_localidad,
         } = cliente;
 
@@ -18,7 +19,7 @@ const Cliente = {create: async (cliente) => {
             `INSERT INTO usuario 
             (nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, id_localidad) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, id_localidad]
+            [nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario,token, id_localidad]
         );
 
         return result.insertId;
