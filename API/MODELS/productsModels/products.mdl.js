@@ -4,7 +4,7 @@ const { pool } = require("../../CONFIGS/db.config");
 //Query search all products
 const ProductModel = {
     async getAllProducts() {
-        const [rows] = await pool.query("SELECT * FROM producto");
+        const [rows] = await pool.query("SELECT * FROM producto LIMIT 50 OFFSET 0");
         return rows;
     },
 
