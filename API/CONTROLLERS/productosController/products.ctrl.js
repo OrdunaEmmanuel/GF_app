@@ -1,15 +1,15 @@
 const ProductModel = require("../../MODELS/productsModels/products.mdl");
 
 const ProductController = {
-    async getAll(req, res) {
+    async getAllProducts(page, limit) {
         try {
-            const products = await ProductModel.getAllProducts();
-            res.json(products);
-        } catch (error) {
-            res.status(500).json({ error: "Error al obtener los productos" });
-            console.log(error)
+            return await ProductModel.getAllProducts(page, limit);
+        } catch (err) {
+            console.error("Error interno en getAllProducts (ctrl):", err);
+            throw err;
         }
-    },
+    }
+    ,
 
     async getById(req, res) {
         try {
@@ -31,19 +31,13 @@ const ProductController = {
         }
     },
 
-    async search(req, res) {
-        try {
-            const { term } = req.body;  // Obtener el término desde el frontend
-            if (!term) {
-                return res.status(400).json({ error: "Se requiere un término de búsqueda" });
-            }
-            const products = await ProductModel.searchProducts(term);
-            res.json(products);
-        } catch (error) {
-            res.status(500).json({ error: "Error en la búsqueda de productos" });
-            console.log(error)
+    async searchProducts(term, page, limit) {
+        if (!term) {
+            return { data: [], total: 0 };
         }
+        return await ProductModel.searchProducts(term, page, limit);
     }
+
 
 };
 
