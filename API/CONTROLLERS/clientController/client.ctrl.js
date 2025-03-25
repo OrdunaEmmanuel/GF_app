@@ -1,7 +1,8 @@
 const Cliente = require("../../MODELS/clientModel/client.mdl.js");
 const bcrypt = require('bcrypt');
-const jwt = require('jwt');
+const jwt = require('jsonwebtoken');
 const auth = require("../../MIDDLEWARE/auth.js")
+const { pool } = require("../../CONFIGS/db.config");
 
 exports.createCliente = async (req, res) => {
     try {
@@ -35,6 +36,7 @@ exports.createCliente = async (req, res) => {
             numero_cel,
             password_user: hashedPassword,
             tipo_usuario,
+            token: "",
             id_localidad,
         };
 
@@ -87,8 +89,7 @@ exports.loginUser = async (req, res) => {
 
         res.json({
             message: "Inicio de sesión exitoso",
-            accessToken,
-            refreshToken
+            accessToken
         });
 
     } catch (error) {

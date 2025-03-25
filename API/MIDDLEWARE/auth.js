@@ -17,17 +17,18 @@ exports.generateRefreshToken = (user) => {
 }
 
 exports.verifyToken = (req, res, next) => {
-    const token = req.header("Authorization")?.split("")[1]
+    // Revisa el formato del token en el header
+    const token = req.header("Authorization")?.split(" ")[1];  // Debería ser 'Bearer <token>'
 
-    if (!token){
-        return res.status(401).json({ error: "No token provided, authorization denied" })
+    if (!token) {
+        return res.status(401).json({ error: "No token provided, authorization denied" });
     }
 
-    try{
-        const verified = jwt.verify(token, process.env.JWT_SECRET)
-        req.user = verified
-        next()
-    }catch(err){
-        return res.status(401).json({ error: "Token invalid, authorization denied" })
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);  // Verifica el token usando tu JWT_SECRET
+        req.user = verified;  // Guarda la info del usuario verificado
+        next();  // Llama al siguiente middleware o controlador
+    } catch (err) {
+        return res.status(401).json({ error: "Token invalid, authorization denied", details: err.message });
     }
-}
+};

@@ -17,9 +17,9 @@ const Cliente = {create: async (cliente) => {
 
         const [result] = await pool.query(
             `INSERT INTO usuario 
-            (nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, id_localidad) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario,token, id_localidad]
+            (nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, token, id_localidad) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, token, id_localidad]
         );
 
         return result.insertId;
@@ -35,7 +35,7 @@ const Cliente = {create: async (cliente) => {
 
     getAll: async () => {
         const [rows] = await pool.query(
-            `SELECT id_usuario, nombre, apellido_p, apellido_m, clave, direcion, curp, numero_cel, password_user, tipo_usuario, id_localidad FROM usuario`
+            `SELECT id_usuario, nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, token, id_localidad FROM usuario`
         );
         return rows;
     },
