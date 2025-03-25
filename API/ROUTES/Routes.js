@@ -31,5 +31,4 @@ router.get('/productos/buscar', queryParser, async (req, res) => {
     }
 });
 
-
 module.exports = router
