@@ -8,13 +8,12 @@ const { connectDB } = require('./API/CONFIGS/db.config');
 const app = express();
 dotenv.config();
 
-app.use(
-  cors({
-    origin: process.env.ACCES_CONTROL_ALLOW_ORIGIN || "*",
-    methods: "GET,POST,OPTIONS,PUT,PATCH,DELETE",
-    allowedHeaders: "Content-Type,Authorization",
-    credentials: true,
-  }));
+app.use(cors({
+  origin: ['http://localhost:3000'],  // Permite solicitudes solo de este origen
+  methods: 'GET,POST,PUT,DELETE',    // Los métodos permitidos
+  allowedHeaders: 'Content-Type, Authorization',  // Los encabezados permitidos
+  credentials: true,  // Permite el uso de cookies
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
