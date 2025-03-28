@@ -2,7 +2,6 @@ const OrderModel = require("../../MODELS/productsModels/order.mdl");
 const ProductModel = require("../../MODELS/productsModels/products.mdl");
 
 const OrderController = {
-    // Obtener todos los pedidos de un usuario
     async getAll(req, res) {
         try {
             const orders = await OrderModel.getOrdersByUser(req.params.id_usuario);
@@ -13,10 +12,9 @@ const OrderController = {
         }
     },
 
-    // Obtener todos los pedidos (sin filtrar por usuario)
     async getOrders(req, res) {
         try {
-            const orders = await OrderModel.getOrders(); // Obtiene todos los pedidos de la base de datos
+            const orders = await OrderModel.getOrders();
             res.json(orders);
         } catch (error) {
             res.status(500).json({ error: "Error al obtener los pedidos" });
@@ -24,7 +22,6 @@ const OrderController = {
         }
     },
 
-    // Obtener un pedido por ID
     async getById(req, res) {
         try {
             const { id } = req.params;
@@ -36,7 +33,6 @@ const OrderController = {
         }
     },
 
-    // Crear un pedido
     async create(req, res) {
         try {
             const { estado, total, metodo_de_pago, fecha_entrega_estimada, direccion, id_usuario } = req.body;
@@ -51,7 +47,6 @@ const OrderController = {
         }
     },
 
-    // Buscar pedidos por término
     async search(req, res) {
         try {
             const { term, id_usuario } = req.body;
@@ -66,7 +61,6 @@ const OrderController = {
         }
     },
 
-    // Agregar un producto a un pedido o crear el pedido si no existe
     async addProductAndCreateOrderIfNeeded(req, res) {
         try {
             const { id_usuario, id_producto, cantidad, direccion, metodo_de_pago, fecha_entrega_estimada } = req.body;
@@ -114,7 +108,6 @@ const OrderController = {
         }
     },
 
-    // Obtener productos por ID del pedido
     async getProductsByOrder(req, res) {
         try {
             const { id_pedido } = req.params;
@@ -124,8 +117,144 @@ const OrderController = {
             res.status(500).json({ error: "Error al obtener los productos del pedido" });
             console.log(error);
         }
+    },
+
+    async editOrder(req, res) {
+        try {
+            const { id_pedido } = req.params;
+            const { estado, total, metodo_de_pago, fecha_entrega_estimada, direccion, productos } = req.body;
+
+            if (!estado || !total || !metodo_de_pago || !fecha_entrega_estimada || !direccion) {
+                return res.status(400).json({ error: "Todos los campos del pedido son obligatorios" });
+            }
+
+            const updatedOrder = await OrderModel.updateOrder(id_pedido, {
+                estado,
+                total,
+                metodo_de_pago,
+                fecha_entrega_estimada,
+                direccion
+            });
+
+            if (!updatedOrder) {
+                return res.status(404).json({ error: "Pedido no encontrado" });
+            }
+
+            if (productos && productos.length > 0) {
+                for (const product of productos) {
+                    const { id_producto, cantidad } = product;
+                    await OrderModel.updateProductInOrder(id_pedido, id_producto, cantidad);
+                }
+            }
+
+            res.json({
+                message: "Pedido y productos actualizados con éxito",
+                order: updatedOrder
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Error al actualizar el pedido" });
+            console.log(error);
+        }
+    },
+
+    async deleteOrder(req, res) {
+        try {
+            const { id_pedido } = req.params;
+            const { eliminarProductos } = req.body;
+
+            if (eliminarProductos) {
+                await OrderModel.deleteProductsFromOrder(id_pedido);
+                return res.json({ message: "Productos del pedido eliminados con éxito" });
+            }
+
+            const deletedOrder = await OrderModel.deleteOrder(id_pedido);
+
+            if (!deletedOrder) {
+                return res.status(404).json({ error: "Pedido no encontrado" });
+            }
+
+            res.json({ message: "Pedido y productos eliminados con éxito" });
+        } catch (error) {
+            res.status(500).json({ error: "Error al eliminar el pedido" });
+            console.log(error);
+        }
+    },
+
+    async deleteProductFromOrder(req, res) {
+        try {
+            const { id_pedido, id_producto } = req.params;  
+
+            const deletedProduct = await OrderModel.deleteProductFromOrder(id_pedido, id_producto);
+
+            if (!deletedProduct) {
+                return res.status(404).json({ error: "Producto no encontrado en este pedido" });
+            }
+
+            res.json({ message: "Producto eliminado del pedido con éxito" });
+        } catch (error) {
+            res.status(500).json({ error: "Error al eliminar el producto del pedido" });
+            console.log(error);
+        }
+    },
+    async editProducts(req, res) {
+        try {
+            const { id_pedido } = req.params;
+            const { productos } = req.body;  // Obtener los productos que se quieren actualizar
+    
+            // Si no hay productos, devolver un error
+            if (!productos || productos.length === 0) {
+                return res.status(400).json({ error: "Se requieren productos para actualizar" });
+            }
+    
+            // Actualizar los productos del pedido
+            for (const product of productos) {
+                const { id_producto, cantidad } = product;
+    
+                // Llamamos a la función para actualizar los productos
+                await OrderModel.updateProductInOrder(id_pedido, id_producto, cantidad);
+            }
+    
+            res.json({
+                message: "Productos del pedido actualizados con éxito",
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Error al actualizar los productos del pedido" });
+            console.log(error);
+        }
+    },
+    
+    // Editar solo el estado y detalles del pedido (sin tocar productos)
+    async editOrderDetails(req, res) {
+        try {
+            const { id_pedido } = req.params;
+            const { estado, total, metodo_de_pago, fecha_entrega_estimada, direccion } = req.body;
+    
+            if (!estado || !total || !metodo_de_pago || !fecha_entrega_estimada || !direccion) {
+                return res.status(400).json({ error: "Todos los campos del pedido son obligatorios" });
+            }
+    
+            // Actualizar los detalles del pedido (sin tocar los productos)
+            const updatedOrder = await OrderModel.updateOrder(id_pedido, {
+                estado,
+                total,
+                metodo_de_pago,
+                fecha_entrega_estimada,
+                direccion
+            });
+    
+            if (!updatedOrder) {
+                return res.status(404).json({ error: "Pedido no encontrado" });
+            }
+    
+            res.json({
+                message: "Pedido actualizado con éxito",
+                order: updatedOrder
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Error al actualizar el pedido" });
+            console.log(error);
+        }
     }
 };
 
 module.exports = OrderController;
-

@@ -5,13 +5,14 @@ const OrderModel = {
         const [rows] = await pool.query("SELECT * FROM pedido");
         return rows;
     },
+
     async getOrdersByUser(id_usuario) {
         const [rows] = await pool.query("SELECT * FROM pedido WHERE id_usuario = ?", [id_usuario]);
         return rows;
     },
 
-    async getOrderById(id_pedido, id_usuario) {
-        const [rows] = await pool.query("SELECT * FROM pedido WHERE id_pedido = ? AND id_usuario = ?", [id_pedido, id_usuario]);
+    async getOrderById(id_pedido) {
+        const [rows] = await pool.query("SELECT * FROM pedido WHERE id_pedido = ?", [id_pedido]);
         return rows[0];
     },
 
@@ -32,7 +33,6 @@ const OrderModel = {
         return rows;
     },
 
-    // Obtener pedido pendiente del usuario
     async getPendingOrderByUser(id_usuario) {
         const [rows] = await pool.query(`
             SELECT * FROM pedido 
@@ -42,9 +42,7 @@ const OrderModel = {
         return rows[0];
     },
 
-    // Agregar producto al pedido (modificado para obtener el precio desde la tabla producto)
     async addProductToOrder({ id_pedido, id_producto, cantidad }) {
-        // Obtener el precio del producto desde la tabla producto
         const [producto] = await pool.query(`
             SELECT precio_distribuidor_IVA 
             FROM producto 
@@ -56,14 +54,12 @@ const OrderModel = {
 
         const precio_unitario = producto[0].precio_distribuidor_IVA;
 
-        // Insertar el producto en order_detail sin almacenar el precio
         const [result] = await pool.query(`
             INSERT INTO order_detail (id_pedido, id_producto, cantidad)
             VALUES (?, ?, ?)`,
             [id_pedido, id_producto, cantidad]
         );
 
-        // Actualizar el total del pedido con el precio calculado
         await pool.query(`
             UPDATE pedido
             SET total = (
@@ -78,7 +74,6 @@ const OrderModel = {
         return result.insertId;
     },
 
-    // Obtener los productos de un pedido
     async getProductsByOrder(id_pedido) {
         const [rows] = await pool.query(`
             SELECT od.id_producto, p.descripcion, od.cantidad, p.precio_distribuidor_IVA AS precio_unitario,
@@ -89,8 +84,83 @@ const OrderModel = {
         `, [id_pedido]);
 
         return rows;
+    },
+
+    async updateOrder(id_pedido, { estado, total, metodo_de_pago, fecha_entrega_estimada, direccion }) {
+        const query = `
+            UPDATE pedido
+            SET estado = ?, total = ?, metodo_de_pago = ?, fecha_entrega_estimada = ?, direccion = ?
+            WHERE id_pedido = ?`;
+
+        const [result] = await pool.query(query, [estado, total, metodo_de_pago, fecha_entrega_estimada, direccion, id_pedido]);
+
+        if (result.affectedRows === 0) {
+            return null;
+        }
+
+        return {
+            id_pedido,
+            estado,
+            total,
+            metodo_de_pago,
+            fecha_entrega_estimada,
+            direccion
+        };
+    },
+
+    async updateProductInOrder(id_pedido, id_producto, cantidad) {
+        const [existingProduct] = await pool.query(`
+            SELECT * FROM order_detail
+            WHERE id_pedido = ? AND id_producto = ?`, [id_pedido, id_producto]);
+
+        if (existingProduct.length > 0) {
+            const [result] = await pool.query(`
+                UPDATE order_detail 
+                SET cantidad = ?
+                WHERE id_pedido = ? AND id_producto = ?`, [cantidad, id_pedido, id_producto]);
+
+            return result.affectedRows > 0;
+        } else {
+            const [result] = await pool.query(`
+                INSERT INTO order_detail (id_pedido, id_producto, cantidad)
+                VALUES (?, ?, ?)`, [id_pedido, id_producto, cantidad]);
+
+            return result.insertId;
+        }
+    },
+
+    async deleteOrder(id_pedido) {
+        const query = `DELETE FROM pedido WHERE id_pedido = ?`;
+        const [result] = await pool.query(query, [id_pedido]);
+
+        if (result.affectedRows === 0) {
+            return null;
+        }
+
+        return true;
+    },
+
+    async deleteProductFromOrder(id_pedido, id_producto) {
+        const query = `DELETE FROM order_detail WHERE id_pedido = ? AND id_producto = ?`;
+        const [result] = await pool.query(query, [id_pedido, id_producto]);
+
+        if (result.affectedRows === 0) {
+            return null;
+        }
+
+        await pool.query(`
+            UPDATE pedido
+            SET total = (
+                SELECT SUM(od.cantidad * p.precio_distribuidor_IVA)
+                FROM order_detail od
+                JOIN producto p ON p.id_producto = od.id_producto
+                WHERE od.id_pedido = ?
+            )
+            WHERE id_pedido = ?
+        `, [id_pedido, id_pedido]);
+
+        return true;
     }
 };
-
 
 module.exports = OrderModel;
