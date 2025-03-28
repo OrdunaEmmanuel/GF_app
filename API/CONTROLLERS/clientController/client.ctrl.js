@@ -79,7 +79,7 @@ exports.loginUser = async (req, res) => {
             return res.status(401).json({ message: "Credenciales incorrectas" });
         }
 
-        const accessToken = auth.generateAccesToken(user);
+        const accessToken = auth.generateAccessToken(user);
         const refreshToken = auth.generateRefreshToken(user);
 
         await pool.query(
@@ -135,5 +135,27 @@ exports.logoutUser = async (req, res) => {
         res.json({ message: "Sesión cerrada correctamente" });
     } catch (err) {
         res.status(500).json({ message: "Error al cerrar sesión", error: err.message });
+    }
+};
+
+exports.deleteCliente = async (req, res) => {
+    const clienteId = req.params.id; 
+
+    try {
+        const [cliente] = await pool.query(
+            "SELECT * FROM usuario WHERE id_usuario = ? AND tipo_usuario = 'cliente'",
+            [clienteId]
+        );
+
+        if (cliente.length === 0) {
+            return res.status(404).json({ message: "Cliente no encontrado" });
+        }
+
+        await pool.query("DELETE FROM usuario WHERE id_usuario = ?", [clienteId]);
+
+        res.json({ message: "Cliente eliminado exitosamente" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error al eliminar el cliente", error: error.message });
     }
 };
