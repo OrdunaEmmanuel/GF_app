@@ -10,5 +10,6 @@ router.get('/getAll', clientCTRL.getClientes)
 router.post('/login', clientCTRL.loginUser)
 router.post('/refresh-token', clientCTRL.refreshToken)
 router.post('/logout', auth.verifyToken,clientCTRL.logoutUser)
+router.delete('/delete/:id', clientCTRL.deleteCliente)
 
 module.exports = router
