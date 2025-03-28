@@ -18,7 +18,8 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(router);
+// app.use(router);
+app.use('/api', router);
 app.use('/clientes/', routeClient)
 
 // Conexión a base de datos
