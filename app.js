@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path=require("path");
 const router=require("./API/ROUTES/Routes")
+const routepedido=require("./API/ROUTES/Routes.pedidos")
 const rateLimit = require("express-rate-limit");
 const { connectDB } = require('./API/CONFIGS/db.config');
 const app = express();
@@ -19,6 +20,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(router);
+app.use("/pedidos/",routepedido);
 
 
 // Conexión a base de datos
