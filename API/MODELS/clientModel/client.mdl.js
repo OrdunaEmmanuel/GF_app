@@ -1,4 +1,10 @@
-const { pool } = require("../../CONFIGS/db.config");
+const {pool} = require("../../CONFIGS/db.config");
+const CrudService = require("../../SERVICES/crudService");
+
+// Inicialización del servicio CRUD
+const clienteCrudService = new CrudService({
+    tableName: 'usuario'
+});
 
 const Cliente = {
     // Crear un nuevo cliente
@@ -16,29 +22,49 @@ const Cliente = {
             id_localidad,
         } = cliente;
 
-        const [result] = await pool.query(
-            `INSERT INTO usuario 
-            (nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, id_localidad) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, id_localidad]
-        );
-
-        return result.insertId;
+        try {
+            const result = await clienteCrudService.create({
+                nombre,
+                apellido_p,
+                apellido_m,
+                clave,
+                direccion,
+                curp,
+                numero_cel,
+                password_user,
+                tipo_usuario,
+                id_localidad
+            });
+            
+            return result.id;
+        } catch (error) {
+            console.error("Error al crear cliente:", error);
+            throw error;
+        }
     },
 
+    // Buscar cliente por número de celular
     findByNumeroCelular: async (numero_celular) => {
-        const [rows] = await pool.query(
-            `SELECT * FROM usuario WHERE numero_cel = ?`,
-            [numero_celular]
-        );
-        return rows.length ? rows[0] : null;
+        try {
+            const conditions = { numero_cel: numero_celular };
+            const result = await clienteCrudService.findAll(conditions, 1, 0);
+            
+            return result.success && result.data.length > 0 ? result.data[0] : null;
+        } catch (error) {
+            console.error("Error al buscar cliente por número de celular:", error);
+            throw error;
+        }
     },
 
+    // Obtener todos los clientes
     getAll: async () => {
-        const [rows] = await pool.query(
-            `SELECT id_usuario, nombre, apellido_p, apellido_m, clave, direcion, curp, numero_cel, password_user, tipo_usuario, id_localidad FROM usuario`
-        );
-        return rows;
+        try {
+            const result = await clienteCrudService.findAll();
+            return result.success ? result.data : [];
+        } catch (error) {
+            console.error("Error al obtener todos los clientes:", error);
+            throw error;
+        }
     },
 };
 
