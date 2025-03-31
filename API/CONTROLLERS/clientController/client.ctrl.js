@@ -66,37 +66,40 @@ exports.getClientes = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
     try {
-        const { numero_cel, password } = req.body;
-
-        const user = await Cliente.findByNumeroCelular(numero_cel);
-
-        if (!user) {
-            return res.status(404).json({ message: "Credenciales incorrectas" });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password_user);
-        if (!isMatch) {
-            return res.status(401).json({ message: "Credenciales incorrectas" });
-        }
-
-        const accessToken = auth.generateAccessToken(user);
-        const refreshToken = auth.generateRefreshToken(user);
-
-        await pool.query(
-            "UPDATE usuario SET token = ? WHERE id_usuario = ?",
-            [refreshToken, user.id_usuario]
-        );
-
-        res.json({
-            message: "Inicio de sesión exitoso",
-            accessToken
-        });
-
+      const { numero_cel, password_user } = req.body;
+      const user = await Cliente.findByNumeroCelular(numero_cel);
+  
+      if (!user) {
+        return res.status(404).json({ message: "Credenciales incorrectas" });
+      }
+  
+      const isMatch = await bcrypt.compare(password_user, user.password_user);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Credenciales incorrectas" });
+      }
+  
+      const accessToken = auth.generateAccessToken(user);
+      const refreshToken = auth.generateRefreshToken(user);
+  
+      await pool.query(
+        "UPDATE usuario SET token = ? WHERE id_usuario = ?",
+        [refreshToken, user.id_usuario]
+      );
+  
+      // Retornamos además el nombre y otros datos útiles
+      res.json({
+        message: "Inicio de sesión exitoso",
+        accessToken,
+        tipo_usuario: user.tipo_usuario,
+        nombre: user.nombre,           // Retornamos el nombre del usuario
+        apellido_p: user.apellido_p    // Opcional: el apellido paterno, por ejemplo
+      });
+  
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error en el servidor", error: error.message });
+      console.error(error);
+      res.status(500).json({ message: "Error en el servidor", error: error.message });
     }
-};
+  };  
 
 exports.refreshToken = async (req, res) => {
     const refreshToken = req.headers["x-refresh-token"];

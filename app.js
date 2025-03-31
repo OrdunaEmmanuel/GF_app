@@ -1,29 +1,31 @@
 const express = require('express');
 const dotenv = require("dotenv");
 const cors = require("cors");
-const path=require("path");
-const router=require("./API/ROUTES/Routes")
-const routepedido=require("./API/ROUTES/Routes.pedidos")
+const path = require("path");
+const routerProducts = require("./API/ROUTES/routes.products");
+const routerClients = require("./API/ROUTES/routes.client");
+const routerOrders = require("./API/ROUTES/routes.pedidos");
 const rateLimit = require("express-rate-limit");
 const { connectDB } = require('./API/CONFIGS/db.config');
 const app = express();
 dotenv.config();
 
 app.use(cors({
-  origin: ['http://localhost:3000'],  // Permite solicitudes solo de este origen
-  methods: 'GET,POST,PUT,DELETE',    // Los métodos permitidos
-  allowedHeaders: 'Content-Type, Authorization',  // Los encabezados permitidos
-  credentials: true,  // Permite el uso de cookies
+  origin: ['http://localhost:3000'],
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type, Authorization',
+  credentials: true,
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(router);
-app.use("/pedidos/",routepedido);
 
+// Configuración de rutas organizadas
+app.use('/api/productos', routerProducts);  // Rutas de productos
+app.use('/api/clientes', routerClients);    // Rutas de clientes
+app.use('/api/pedidos', routerOrders);      // Rutas de pedidos
 
 // Conexión a base de datos
-
 connectDB();
 
 const port = process.env.PORT || 3001;

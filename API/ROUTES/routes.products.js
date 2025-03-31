@@ -3,10 +3,6 @@ const router=express.Router();
 const clientController=require("../CONTROLLERS/clientController/client.ctrl")
 const ProductController=require("../CONTROLLERS/productosController/products.ctrl")
 
-// Routes client
-router.post('/register', clientController.createCliente);
-router.post('/getClientes', clientController.getClientes);
-
 // Routes products
 router.get('/productos', async (req, res) => {
     try {
@@ -22,7 +18,5 @@ router.get('/productos', async (req, res) => {
 
 router.get("/getbyId/:id", ProductController.getById);
 router.post("/buscarByname", ProductController.search);
-
-
 
 module.exports = router;
