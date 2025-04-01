@@ -1,5 +1,5 @@
-const OrderModel = require("../../MODELS/productsModels/order.mdl");
-const ProductModel = require("../../MODELS/productsModels/products.mdl");
+const OrderModel = require("../../MODELS/orderModel/order.mdl");
+const ProductModel = require("../../MODELS/productModel/product.mdl");
 
 const OrderController = {
     async getAll(req, res) {
