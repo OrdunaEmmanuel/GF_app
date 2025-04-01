@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require("dotenv");
 const cors = require("cors");
+
 const path=require("path");
 const router=require("./API/ROUTES/Routes")
 const routeClient = require('./API/ROUTES/route.client')
@@ -32,3 +33,4 @@ app.listen(port, () => {
   console.log(`🚀 Servidor funcionando en http://localhost:${port}`);
   console.log("=============================================");
 });
+
