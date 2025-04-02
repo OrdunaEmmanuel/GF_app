@@ -2,30 +2,19 @@ const Cliente = require("../../MODELS/clientModel/client.mdl.js");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const auth = require("../../MIDDLEWARE/auth.js")
+const CRUD = require('../../SERVICES/crudService.js')
 const { pool } = require("../../CONFIGS/db.config");
 
 exports.createCliente = async (req, res) => {
     try {
-        const {
-            nombre,
-            apellido_p,
-            apellido_m,
-            clave,
-            direccion,
-            curp,
-            numero_cel,
-            password_user,
-            tipo_usuario,
-            id_localidad,
-        } = req.body;
+        const { nombre, apellido_p, apellido_m, clave, direccion, curp, numero_cel, password_user, tipo_usuario, id_localidad } = req.body;
 
-        const clienteExistente = await Cliente.findByNumeroCelular(numero_cel);
+        const clienteExistente = await CRUD.findById('usuario', numero_cel)
         if (clienteExistente) {
             return res.status(400).json({ error: "El número de celular ya está registrado." });
         }
 
-        const hashedPassword = await bcrypt.hash(password_user, 10);
-
+        const hashedPassword = await bcrypt.hash(password_user, 10)
         const cliente = {
             nombre,
             apellido_p,
@@ -40,7 +29,8 @@ exports.createCliente = async (req, res) => {
             id_localidad,
         };
 
-        const idCliente = await Cliente.create(cliente);
+        // Usamos el CRUD global para crear el cliente
+        const idCliente = await CRUD.create('usuario', cliente);
 
         res.status(201).json({ msg: "Cliente registrado con éxito", idCliente });
 
@@ -49,6 +39,7 @@ exports.createCliente = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 exports.getClientes = async (req, res) => {
     try {
