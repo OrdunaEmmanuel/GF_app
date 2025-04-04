@@ -35,11 +35,23 @@ const OrderController = {
 
     async create(req, res) {
         try {
-            const { estado, total, metodo_de_pago, fecha_entrega_estimada, direccion, id_usuario } = req.body;
-            if (!estado || !total || !metodo_de_pago || !fecha_entrega_estimada || !direccion || !id_usuario) {
+            const { estado, total, metodo_de_pago, fecha_entrega_estimada, direccion, id_usuario, fecha_levantamiento_pedido } = req.body;
+            // Validar que los campos estén definidos (permitiendo total = 0)
+            if (estado == null || total == null || !metodo_de_pago || !fecha_entrega_estimada || !direccion || !id_usuario) {
                 return res.status(400).json({ error: "Todos los campos son obligatorios" });
             }
-            const orderId = await OrderModel.createOrder(req.body);
+            // Si no se envía fecha de levantamiento, se usa la fecha actual
+            const pedidoData = {
+                estado,
+                total,
+                metodo_de_pago,
+                fecha_levantamiento_pedido: fecha_levantamiento_pedido || new Date().toISOString().slice(0, 10),
+                fecha_entrega_estimada,
+                direccion,
+                id_usuario
+            };
+
+            const orderId = await OrderModel.createOrder(pedidoData);
             res.status(201).json({ message: "Pedido creado", id: orderId });
         } catch (error) {
             res.status(500).json({ error: "Error al crear el pedido" });
@@ -61,10 +73,10 @@ const OrderController = {
         }
     },
 
+    // Este método queda conservado si lo necesitas, pero el front utilizará addProductToOrder
     async addProductAndCreateOrderIfNeeded(req, res) {
         try {
             const { id_usuario, id_producto, cantidad, direccion, metodo_de_pago, fecha_entrega_estimada } = req.body;
-
             if (!id_usuario || !id_producto || !cantidad || !direccion || !metodo_de_pago || !fecha_entrega_estimada) {
                 return res.status(400).json({ error: "Todos los campos son obligatorios" });
             }
@@ -102,6 +114,25 @@ const OrderController = {
                 id_pedido: pedido.id_pedido
             });
 
+        } catch (error) {
+            res.status(500).json({ error: "Error al agregar producto al pedido" });
+            console.log(error);
+        }
+    },
+
+    // NUEVO MÉTODO: Solo agrega un producto a un pedido existente
+    async addProductToOrder(req, res) {
+        try {
+            const { id_pedido, id_producto, cantidad } = req.body;
+            if (!id_pedido || !id_producto || !cantidad) {
+                return res.status(400).json({ error: "id_pedido, id_producto y cantidad son obligatorios" });
+            }
+            const producto = await ProductModel.getProductById(id_producto);
+            if (!producto) {
+                return res.status(404).json({ error: "Producto no encontrado" });
+            }
+            await OrderModel.addProductToOrder({ id_pedido, id_producto, cantidad });
+            res.status(201).json({ message: "Producto agregado al pedido", id_pedido });
         } catch (error) {
             res.status(500).json({ error: "Error al agregar producto al pedido" });
             console.log(error);
@@ -182,8 +213,7 @@ const OrderController = {
 
     async deleteProductFromOrder(req, res) {
         try {
-            const { id_pedido, id_producto } = req.params;  
-
+            const { id_pedido, id_producto } = req.params;
             const deletedProduct = await OrderModel.deleteProductFromOrder(id_pedido, id_producto);
 
             if (!deletedProduct) {
@@ -196,21 +226,18 @@ const OrderController = {
             console.log(error);
         }
     },
+
     async editProducts(req, res) {
         try {
             const { id_pedido } = req.params;
             const { productos } = req.body;  // Obtener los productos que se quieren actualizar
     
-            // Si no hay productos, devolver un error
             if (!productos || productos.length === 0) {
                 return res.status(400).json({ error: "Se requieren productos para actualizar" });
             }
     
-            // Actualizar los productos del pedido
             for (const product of productos) {
                 const { id_producto, cantidad } = product;
-    
-                // Llamamos a la función para actualizar los productos
                 await OrderModel.updateProductInOrder(id_pedido, id_producto, cantidad);
             }
     
@@ -223,7 +250,6 @@ const OrderController = {
         }
     },
     
-    // Editar solo el estado y detalles del pedido (sin tocar productos)
     async editOrderDetails(req, res) {
         try {
             const { id_pedido } = req.params;
@@ -233,7 +259,6 @@ const OrderController = {
                 return res.status(400).json({ error: "Todos los campos del pedido son obligatorios" });
             }
     
-            // Actualizar los detalles del pedido (sin tocar los productos)
             const updatedOrder = await OrderModel.updateOrder(id_pedido, {
                 estado,
                 total,

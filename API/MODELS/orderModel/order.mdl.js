@@ -16,13 +16,14 @@ const OrderModel = {
         return rows[0];
     },
 
-    async createOrder({ estado, total, metodo_de_pago, fecha_entrega_estimada, direccion, id_usuario }) {
+    async createOrder({ estado, total, metodo_de_pago, fecha_levantamiento_pedido, fecha_entrega_estimada, direccion, id_usuario }) {
         const query = `
-            INSERT INTO pedido (estado, total, metodo_de_pago, fecha_entrega_estimada, direccion, id_usuario) 
-            VALUES (?, ?, ?, ?, ?, ?)`;
-        const [result] = await pool.query(query, [estado, total, metodo_de_pago, fecha_entrega_estimada, direccion, id_usuario]);
+            INSERT INTO pedido (estado, total, metodo_de_pago, fecha_levantamiento_pedido, fecha_entrega_estimada, direccion, id_usuario)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        const [result] = await pool.query(query, [estado, total, metodo_de_pago, fecha_levantamiento_pedido, fecha_entrega_estimada, direccion, id_usuario]);
         return result.insertId;
-    },
+    },    
 
     async searchOrders(searchTerm, id_usuario) {
         const searchValue = `%${searchTerm}%`;
