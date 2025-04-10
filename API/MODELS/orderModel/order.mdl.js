@@ -6,8 +6,17 @@ const OrderModel = {
         return rows;
     },
 
-    async getOrdersByUser(id_usuario) {
-        const [rows] = await pool.query("SELECT * FROM pedido WHERE id_usuario = ?", [id_usuario]);
+    async getOrdersByUser(id_usuario, estado) {
+        let query = "SELECT * FROM pedido WHERE id_usuario = ?";
+        const params = [id_usuario];
+
+        if (estado && estado !== 'Todas') {
+            query += " AND estado = ?";
+            params.push(estado);
+        }
+
+        query += " ORDER BY fecha_levantamiento_pedido DESC";
+        const [rows] = await pool.query(query, params);
         return rows;
     },
 
@@ -23,7 +32,7 @@ const OrderModel = {
         `;
         const [result] = await pool.query(query, [estado, total, metodo_de_pago, fecha_levantamiento_pedido, fecha_entrega_estimada, direccion, id_usuario]);
         return result.insertId;
-    },    
+    },
 
     async searchOrders(searchTerm, id_usuario) {
         const searchValue = `%${searchTerm}%`;

@@ -4,7 +4,9 @@ const ProductModel = require("../../MODELS/productModel/product.mdl");
 const OrderController = {
     async getAll(req, res) {
         try {
-            const orders = await OrderModel.getOrdersByUser(req.params.id_usuario);
+            const { id_usuario } = req.params;
+            const estado = req.query.estado;
+            const orders = await OrderModel.getOrdersByUser(id_usuario, estado);
             res.json(orders);
         } catch (error) {
             res.status(500).json({ error: "Error al obtener los pedidos" });
@@ -231,16 +233,16 @@ const OrderController = {
         try {
             const { id_pedido } = req.params;
             const { productos } = req.body;  // Obtener los productos que se quieren actualizar
-    
+
             if (!productos || productos.length === 0) {
                 return res.status(400).json({ error: "Se requieren productos para actualizar" });
             }
-    
+
             for (const product of productos) {
                 const { id_producto, cantidad } = product;
                 await OrderModel.updateProductInOrder(id_pedido, id_producto, cantidad);
             }
-    
+
             res.json({
                 message: "Productos del pedido actualizados con éxito",
             });
@@ -249,16 +251,16 @@ const OrderController = {
             console.log(error);
         }
     },
-    
+
     async editOrderDetails(req, res) {
         try {
             const { id_pedido } = req.params;
             const { estado, total, metodo_de_pago, fecha_entrega_estimada, direccion } = req.body;
-    
+
             if (!estado || !total || !metodo_de_pago || !fecha_entrega_estimada || !direccion) {
                 return res.status(400).json({ error: "Todos los campos del pedido son obligatorios" });
             }
-    
+
             const updatedOrder = await OrderModel.updateOrder(id_pedido, {
                 estado,
                 total,
@@ -266,11 +268,11 @@ const OrderController = {
                 fecha_entrega_estimada,
                 direccion
             });
-    
+
             if (!updatedOrder) {
                 return res.status(404).json({ error: "Pedido no encontrado" });
             }
-    
+
             res.json({
                 message: "Pedido actualizado con éxito",
                 order: updatedOrder

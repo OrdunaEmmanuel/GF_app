@@ -28,7 +28,11 @@ app.use('/api/pedidos', routerOrders);      // Rutas de pedidos
 // Conexión a base de datos
 connectDB();
 
-const port = process.env.PORT || 3001;
+app.get('/', (req, res) => {
+  res.send('🚀 La API está funcionando correctamente');
+});
+
+const port = process.env.PORT;
 app.listen(port, () => {
   console.log("=============================================");
   console.log(`🚀 Servidor funcionando en http://localhost:${port}`);
