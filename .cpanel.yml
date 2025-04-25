@@ -1,7 +1,0 @@
----
-deployment:
-  tasks:
-    - /opt/cpanel/ea-nodejs16/bin/npm install
-    - echo "Despliegue exitoso"
-    - touch tmp/restart.txt
-    - echo "Despliegue exitoso"

@@ -50,6 +50,46 @@ exports.createCliente = async (req, res) => {
     }
 };
 
+exports.updateCliente = async (req, res) => {
+    const id = req.params.id;
+    const {
+      nombre, apellido_p, apellido_m, clave,
+      direccion, curp, numero_cel, password_user,
+      tipo_usuario, id_localidad
+    } = req.body;
+  
+    try {
+      const hashedPassword = password_user
+        ? await bcrypt.hash(password_user, 10)
+        : undefined;
+  
+      const fields = [
+        'nombre', 'apellido_p', 'apellido_m', 'clave', 'direccion',
+        'curp', 'numero_cel', 'tipo_usuario', 'id_localidad'
+      ];
+  
+      const values = [
+        nombre, apellido_p, apellido_m, clave, direccion,
+        curp, numero_cel, tipo_usuario, id_localidad
+      ];
+  
+      if (hashedPassword) {
+        fields.push('password_user');
+        values.push(hashedPassword);
+      }
+  
+      const sets = fields.map(f => `${f} = ?`).join(', ');
+      values.push(id);
+  
+      await pool.query(`UPDATE usuario SET ${sets} WHERE id_usuario = ?`, values);
+  
+      res.json({ message: 'Cliente actualizado correctamente' });
+    } catch (error) {
+      console.error("Error actualizando cliente:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };  
+
 exports.getClientes = async (req, res) => {
     try {
         const clientes = await Cliente.getAll();
@@ -63,6 +103,27 @@ exports.getClientes = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.getClienteById = async (req, res) => {
+    const id = req.params.id;
+    try {
+      const [rows] = await pool.query(
+        `SELECT id_usuario, nombre, apellido_p, apellido_m, direccion, tipo_usuario, id_localidad 
+         FROM usuario 
+         WHERE id_usuario = ?`,
+        [id]
+      );
+  
+      if (rows.length === 0) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+  
+      res.json(rows[0]);
+    } catch (error) {
+      console.error("Error obteniendo cliente por ID:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };  
 
 exports.loginUser = async (req, res) => {
     try {
@@ -172,20 +233,46 @@ exports.deleteCliente = async (req, res) => {
     const clienteId = req.params.id;
 
     try {
-        const [cliente] = await pool.query(
-            "SELECT * FROM usuario WHERE id_usuario = ? AND tipo_usuario = 'cliente'",
-            [clienteId]
-        );
+        const [cliente] = await pool.query("SELECT * FROM usuario WHERE id_usuario = ?", [clienteId]);
 
         if (cliente.length === 0) {
-            return res.status(404).json({ message: "Cliente no encontrado" });
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        if (cliente[0].tipo_usuario === 'admin') {
+            return res.status(403).json({ message: "No se puede eliminar un administrador" });
         }
 
         await pool.query("DELETE FROM usuario WHERE id_usuario = ?", [clienteId]);
 
-        res.json({ message: "Cliente eliminado exitosamente" });
+        res.json({ message: "Usuario eliminado exitosamente" });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error al eliminar el cliente", error: error.message });
+        console.error("Error al eliminar el usuario:", error);
+        res.status(500).json({ message: "Error al eliminar el usuario", error: error.message });
+    }
+};
+
+exports.getLocalidadById = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const [rows] = await pool.query("SELECT * FROM localidad WHERE id_localidad = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ message: "Localidad no encontrada" });
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Error obteniendo localidad:", err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.getRutaById = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const [rows] = await pool.query("SELECT * FROM ruta WHERE id_ruta = ?", [id]);
+        if (rows.length === 0) return res.status(404).json({ message: "Ruta no encontrada" });
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Error obteniendo ruta:", err);
+        res.status(500).json({ error: err.message });
     }
 };
