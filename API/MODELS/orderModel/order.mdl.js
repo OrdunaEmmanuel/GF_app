@@ -1,24 +1,57 @@
 const { pool } = require("../../CONFIGS/db.config");
 
 const OrderModel = {
-    async getOrders(id_usuario) {
-        const [rows] = await pool.query("SELECT * FROM pedido");
-        return rows;
-    },
-
-    async getOrdersByUser(id_usuario, estado) {
-        let query = "SELECT * FROM pedido WHERE id_usuario = ?";
+    async getOrders() {
+        const [rows] = await pool.query(`
+            SELECT 
+            p.*, 
+            u.nombre AS nombre_usuario, 
+            u.apellido_p, 
+            u.apellido_m, 
+            l.nombre AS localidad_nombre,
+            l.id_ruta,
+            r.nombre AS nombre_ruta,
+            r.dia_entrega  -- 👈 Asegúrate de incluir esto
+            FROM pedido p
+            JOIN usuario u ON p.id_usuario = u.id_usuario
+            LEFT JOIN localidad l ON u.id_localidad = l.id_localidad
+            LEFT JOIN ruta r ON l.id_ruta = r.id_ruta
+        `);
+    
+        return rows.map(row => ({
+          ...row,
+          nombre_completo: `${row.nombre_usuario} ${row.apellido_p} ${row.apellido_m}`
+        }));
+      },
+    
+      async getOrdersByUser(id_usuario, estado) {
+        let query = `
+          SELECT 
+            p.*, 
+            u.nombre AS nombre_usuario, 
+            u.apellido_p, 
+            u.apellido_m, 
+            l.nombre AS localidad_nombre
+          FROM pedido p
+          JOIN usuario u ON p.id_usuario = u.id_usuario
+          LEFT JOIN localidad l ON u.id_localidad = l.id_localidad
+          WHERE p.id_usuario = ?
+        `;
         const params = [id_usuario];
-
+    
         if (estado && estado !== 'Todas') {
-            query += " AND estado = ?";
-            params.push(estado);
+          query += " AND p.estado = ?";
+          params.push(estado);
         }
-
-        query += " ORDER BY fecha_levantamiento_pedido DESC";
+    
+        query += " ORDER BY p.fecha_levantamiento_pedido DESC";
         const [rows] = await pool.query(query, params);
-        return rows;
-    },
+    
+        return rows.map(row => ({
+          ...row,
+          nombre_completo: `${row.nombre_usuario} ${row.apellido_p} ${row.apellido_m}`
+        }));
+      },    
 
     async getOrderById(id_pedido) {
         const [rows] = await pool.query("SELECT * FROM pedido WHERE id_pedido = ?", [id_pedido]);
@@ -94,6 +127,12 @@ const OrderModel = {
         `, [id_pedido]);
 
         return rows;
+    },
+
+    async updateOrderState(id_pedido, estado) {
+        const query = `UPDATE pedido SET estado = ? WHERE id_pedido = ?`;
+        const [result] = await pool.query(query, [estado, id_pedido]);
+        return result.affectedRows > 0;
     },
 
     async updateOrder(id_pedido, { estado, total, metodo_de_pago, fecha_entrega_estimada, direccion }) {

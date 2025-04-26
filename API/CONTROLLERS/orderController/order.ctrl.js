@@ -1,7 +1,9 @@
 const OrderModel = require("../../MODELS/orderModel/order.mdl");
 const ProductModel = require("../../MODELS/productModel/product.mdl");
+const { DateTime } = require("luxon");
 
 const OrderController = {
+    
     async getAll(req, res) {
         try {
             const { id_usuario } = req.params;
@@ -16,13 +18,13 @@ const OrderController = {
 
     async getOrders(req, res) {
         try {
-            const orders = await OrderModel.getOrders();
-            res.json(orders);
+          const orders = await OrderModel.getOrders();
+          res.json(orders);
         } catch (error) {
-            res.status(500).json({ error: "Error al obtener los pedidos" });
-            console.log(error);
+          res.status(500).json({ error: "Error al obtener los pedidos" });
+          console.log(error);
         }
-    },
+      },      
 
     async getById(req, res) {
         try {
@@ -47,7 +49,7 @@ const OrderController = {
                 estado,
                 total,
                 metodo_de_pago,
-                fecha_levantamiento_pedido: fecha_levantamiento_pedido || new Date().toISOString().slice(0, 10),
+                fecha_levantamiento_pedido: fecha_levantamiento_pedido || DateTime.now().setZone("America/Mexico_City").toFormat("yyyy-MM-dd HH:mm:ss"),
                 fecha_entrega_estimada,
                 direccion,
                 id_usuario
@@ -151,6 +153,26 @@ const OrderController = {
             console.log(error);
         }
     },
+
+    async setOrderToPending(req, res) {
+        try {
+          const { id_pedido } = req.params;
+      
+          const order = await OrderModel.getOrderById(id_pedido);
+          if (!order) {
+            return res.status(404).json({ error: "Pedido no encontrado" });
+          }
+      
+          if (order.estado === "enviado") {
+            await OrderModel.updateOrderState(id_pedido, "pendiente");
+          }
+      
+          res.json({ message: "Estado actualizado si era 'enviado'" });
+        } catch (error) {
+          res.status(500).json({ error: "Error al actualizar el estado del pedido" });
+          console.log(error);
+        }
+      },      
 
     async editOrder(req, res) {
         try {
