@@ -24,7 +24,18 @@ const OrderController = {
           res.status(500).json({ error: "Error al obtener los pedidos" });
           console.log(error);
         }
-      },      
+      },
+
+      async getOrdersWithUnits(req, res) {
+        try {
+          const orders = await OrderModel.getOrdersWithUnits();
+          res.json(orders);
+        } catch (error) {
+          res.status(500).json({ error: "Error al obtener los pedidos con unidades" });
+          console.log(error);
+        }
+      },
+            
 
     async getById(req, res) {
         try {

@@ -11,7 +11,7 @@ const OrderModel = {
             l.nombre AS localidad_nombre,
             l.id_ruta,
             r.nombre AS nombre_ruta,
-            r.dia_entrega  -- 👈 Asegúrate de incluir esto
+            r.dia_entrega
             FROM pedido p
             JOIN usuario u ON p.id_usuario = u.id_usuario
             LEFT JOIN localidad l ON u.id_localidad = l.id_localidad
@@ -23,6 +23,33 @@ const OrderModel = {
           nombre_completo: `${row.nombre_usuario} ${row.apellido_p} ${row.apellido_m}`
         }));
       },
+
+      async getOrdersWithUnits() {
+        const [rows] = await pool.query(`
+          SELECT 
+            p.*, 
+            u.nombre AS nombre_usuario, 
+            u.apellido_p, 
+            u.apellido_m, 
+            l.nombre AS localidad_nombre,
+            l.id_ruta,
+            r.nombre AS nombre_ruta,
+            r.dia_entrega,
+            IFNULL(SUM(od.cantidad), 0) AS unidades
+          FROM pedido p
+          JOIN usuario u ON p.id_usuario = u.id_usuario
+          LEFT JOIN localidad l ON u.id_localidad = l.id_localidad
+          LEFT JOIN ruta r ON l.id_ruta = r.id_ruta
+          LEFT JOIN order_detail od ON p.id_pedido = od.id_pedido
+          GROUP BY p.id_pedido
+          ORDER BY p.fecha_levantamiento_pedido DESC
+        `);
+      
+        return rows.map(row => ({
+          ...row,
+          nombre_completo: `${row.nombre_usuario} ${row.apellido_p} ${row.apellido_m}`
+        }));
+      },      
     
       async getOrdersByUser(id_usuario, estado) {
         let query = `
