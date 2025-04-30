@@ -12,7 +12,7 @@ dotenv.config();
 
 app.use(
   cors({
-    origin: "*",
+    origin:'*',
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type, Authorization",
     credentials: true,
@@ -22,7 +22,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración de rutas organizadas
+// Configuración de rutas organizada
 app.use("/api/productos", routerProducts); // Rutas de productos
 app.use("/api/clientes", routerClients); // Rutas de clientes
 app.use("/api/pedidos", routerOrders); // Rutas de pedidos
