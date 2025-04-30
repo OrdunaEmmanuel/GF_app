@@ -16,6 +16,7 @@ router.delete(
 );
 router.delete("/:id_pedido", OrderController.deleteOrder);
 router.put("/estado/pendiente/:id_pedido", OrderController.setOrderToPending);
+router.get("/unidades", OrderController.getOrdersWithUnits);
 
 router.get("/:id", OrderController.getById);
 
