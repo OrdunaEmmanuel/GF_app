@@ -181,12 +181,18 @@ const OrderModel = {
   async getProductsByOrder(id_pedido) {
     const [rows] = await pool.query(
       `
-            SELECT od.id_producto, p.descripcion, od.cantidad, p.precio_publico_con_IVA AS precio_unitario,
-                   (od.cantidad * p.precio_publico_con_IVA) AS total
-            FROM order_detail od
-            JOIN producto p ON p.id_producto = od.id_producto
-            WHERE od.id_pedido = ?
-        `,
+      SELECT 
+        od.id_producto, 
+        p.clave,
+        p.codigo,
+        p.descripcion, 
+        od.cantidad, 
+        p.precio_publico_con_IVA AS precio_unitario,
+        (od.cantidad * p.precio_publico_con_IVA) AS total
+      FROM order_detail od
+      JOIN producto p ON p.id_producto = od.id_producto
+      WHERE od.id_pedido = ?
+      `,
       [id_pedido],
     );
 
